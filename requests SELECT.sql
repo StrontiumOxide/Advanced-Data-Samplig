@@ -1,7 +1,7 @@
 -- Задание №2
--- Самый продолжительный трек.
-select max("Duration")
-from track
+-- Самый продолжительный трек. ПЕРЕДЕЛАННЫЙ!
+SELECT * FROM track t 
+WHERE "Duration" = (SELECT max("Duration") FROM track t2);
 
 -- Треки длиннее 3,5 мин.
 select "Name", "Duration"
@@ -18,10 +18,10 @@ select "Name"
 from executor
 where "Name" not like '% %';
 
--- Названия треков, содержащих "мой" или "my". Таких нет
+-- Названия треков, содержащих "мой" или "my". Таких нет. ПЕРЕДЕЛАННЫЙ!
 select "Name"
 from track
-where "Name" like '%мой%' or "Name" like '%my%';
+where "Name" ilike '%мой%' or "Name" ilike '%my%';
 
 
 -- Задание №3
@@ -46,12 +46,15 @@ group by "AlbumID"
 order by avg("Duration") desc 
 
 
--- Все исполнители, которые не вупыстили свои альбомы в 2022 году. Это все исполнители
-select e."Name" , a."Name", a."Year of issue" 
-from executoralbum as ea
-join album as a on ea."AlbumID" = a."AlbumID" 
-join executor as e on ea."ExecutorID" = e."ExecutorID" 
-where extract (year from a."Year of issue") != 2022
+-- Все исполнители, которые не вупыстили свои альбомы в 2022 году. ПЕРЕДЕЛАННЫЙ!
+SELECT e."Name" FROM executor e 
+WHERE e."Name" NOT IN (
+		SELECT e."Name" FROM executor e 
+		FULL JOIN executoralbum ea ON ea."ExecutorID" = e."ExecutorID"
+		LEFT JOIN album a ON a."AlbumID" = ea."AlbumID"
+		WHERE EXTRACT (YEAR FROM a."Year of issue") = 2022
+		)
+ORDER BY e."Name" 
 
 
 -- Название сборников, в которых присутствует исполнитель "Некто"
